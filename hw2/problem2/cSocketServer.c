@@ -5,7 +5,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <unistd.h>
-#define PORT 8080
+#define PORT 0 // setting port to 0 will automatically find a working port
 int main(int argc, char const *argv[])
 {
     int server_fd, new_socket, valread;
@@ -31,7 +31,7 @@ int main(int argc, char const *argv[])
     }
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons( PORT );
+    address.sin_port = ntohs(PORT);
       
     // Forcefully attaching socket to the port 8080
     if (bind(server_fd, (struct sockaddr *)&address, 
@@ -40,11 +40,20 @@ int main(int argc, char const *argv[])
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
+
     if (listen(server_fd, 3) < 0)
     {
         perror("listen");
         exit(EXIT_FAILURE);
     }
+
+    socklen_t slen = sizeof(address); // Need to update the socket address once assigned
+    if(getsockname(server_fd, (struct sockaddr *)&address, &slen) == -1) {
+	perror("getsockname failed");
+	exit(EXIT_FAILURE);
+    }
+    printf("Server listening on port: %d\n", ntohs(address.sin_port)); // then print out the port number
+
     if ((new_socket = accept(server_fd, (struct sockaddr *)&address, 
                        (socklen_t*)&addrlen))<0)
     {
