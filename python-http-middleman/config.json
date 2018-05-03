@@ -1,0 +1,7 @@
+{
+	"servers": [{
+		"address": "sensorseed.quade.co"
+	},{
+		"address": "requestbin.fullcontact.com"
+	}]
+}
